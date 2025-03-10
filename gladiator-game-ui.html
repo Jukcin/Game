@@ -161,7 +161,7 @@
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap : 0;
+            gap: 0;
         }
 
         .inventory-slot {
@@ -170,39 +170,32 @@
             background-color: #4a4a4a;
             border: 1px solid #6b5c2e;
             margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Items of different sizes */
-        .item-2x1 {
-            grid-column: span 2;
-        }
-
-        .item-2x2 {
-            grid-column: span 2;
-            grid-row: span 2;
-        }
-
-        .item-3x1 {
-            grid-column: span 3;
+        .item-1x3 {
+            grid-row: span 3;
+            height: 120px;
         }
 
         .tooltip {
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 5px;
-        border-radius: 5px;
-        font-size: 12px;
-        pointer-events: none;
-        transform: translateY(-100%);
-        white-space: nowrap;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            transform: translateY(-100%);
+            white-space: nowrap;
         }
 
         .dragging {
             opacity: 0.5;
         }
-
-
     </style>
 </head>
 <body>
@@ -267,10 +260,8 @@
         </div>
         <div class="inventory-title">Inventory</div>
         <div id="inventory" class="inventory-grid">
-
             <!-- 5 rows of 12 slots = 60 slots total -->
             <!-- Row 1 -->
-            
             <div class="inventory-slot"></div>
             <div class="inventory-slot"></div>
             <div class="inventory-slot"></div>
@@ -340,8 +331,7 @@
             <div class="inventory-slot"></div>
             <div class="inventory-slot"></div>
         </div>
-        </div>
     </div>
-    <script src="Draganddropitems.js"></script>
+    <script type="module" src="Draganddropitems.js"></script>
 </body>
 </html>

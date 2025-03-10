@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function createItemElement(item) {
         const itemElement = document.createElement("div");
-        itemElement.classList.add("inventory-slot", "item-3x1");
+        itemElement.classList.add("inventory-slot", `item-${item.size.cols}x${item.size.rows}`);
         itemElement.draggable = true;
         itemElement.innerHTML = `${item.emoji}`;
         itemElement.dataset.name = item.name;
@@ -64,7 +64,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (inventorySlots.length > 0) {
-        inventorySlots[0].appendChild(createItemElement(Items.BasicWoodenSword)); // Spawn in first inventory slot
+        const firstSlot = inventorySlots[0];
+        const itemElement = createItemElement(Items.BasicWoodenSword);
+
+        // Debugging: Log the first slot and item element
+        console.log("First Slot:", firstSlot);
+        console.log("Item Element:", itemElement);
+
+        // Append the item to the first slot
+        firstSlot.appendChild(itemElement);
+
+        // Disable the next two slots below the first slot
+        const secondSlot = firstSlot.nextElementSibling;
+        const thirdSlot = secondSlot.nextElementSibling;
+        secondSlot.style.display = "none";
+        thirdSlot.style.display = "none";
     }
 
     setupDragAndDrop();

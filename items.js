@@ -10,8 +10,15 @@ class Item {
 }
 
 // Example item definitions
-const Items = {
-    BasicWoodenSword: new Item("Basic Wooden Sword", "sword", 3, 1, { rows: 3, cols: 1 }, "\uD83D\uDDE1️"),
+export const Items = {
+    BasicWoodenSword: new Item(
+        "Basic Wooden Sword",
+        "sword",
+        3,
+        1,
+        { rows: 3, cols: 1 },
+        "🗡️"
+    ),
 };
 
-export { Item, Items };
+export const items = Object.values(Items);
