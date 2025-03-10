@@ -159,43 +159,64 @@
         }
 
         .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 0;
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(12, 40px);
+        grid-template-rows: repeat(5, 40px);
+        gap: 0;
         }
 
+        /* These are your background grid cells (unchanged) */
         .inventory-slot {
-            width: 40px;
-            height: 40px;
-            background-color: #4a4a4a;
-            border: 1px solid #6b5c2e;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: #4a4a4a;
+        border: 1px solid #6b5c2e;
+        box-sizing: border-box;
         }
 
-        /* Items of different sizes */
-        .item-1x3 {
-            grid-row: span 3;
-            height: 120px;
+        /* Items on the overlay */
+        .inventory-item {
+        background-color: #6b5c2e;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        z-index: 10;
         }
 
         .tooltip {
-            position: absolute;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            pointer-events: none;
-            transform: translateY(-100%);
-            white-space: nowrap;
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 3px;
+        border-radius: 3px;
+        font-size: 10px;
+        top: -30px;
+        left: 0;
+        white-space: nowrap;
+        }
+
+
+
+
+        /* Items of different sizes */
+        .item-1x3 {
+        height: 120px;
+        grid-row: span 3;
+        }
+
+        /* Optional styling for occupied slots */
+        .inventory-slot.occupied {
+        background-color: transparent;
+        border: none;
         }
 
         .dragging {
             opacity: 0.5;
         }
+
     </style>
 </head>
 <body>
