@@ -161,41 +161,69 @@
         .inventory-grid {
         position: relative;
         display: grid;
-        grid-template-columns: repeat(12, 40px);
-        grid-template-rows: repeat(5, 40px);
+        grid-template-columns: repeat(12, 36px) !important; /* Smaller grid */
+        grid-template-rows: repeat(5, 36px) !important; /* Smaller grid */
         gap: 0;
         }
 
-        /* These are your background grid cells (unchanged) */
         .inventory-slot {
-        width: 40px;
-        height: 40px;
+        width: 36px !important;
+        height: 36px !important;
         background-color: #4a4a4a;
         border: 1px solid #6b5c2e;
         box-sizing: border-box;
         }
 
-        /* Items on the overlay */
         .inventory-item {
         background-color: #6b5c2e;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
+        font-size: 18px; /* Slightly smaller for better fit */
         z-index: 10;
+        border: 2px solid #8a7a3d;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        box-sizing: border-box; /* Include borders in size calculations */
         }
 
+        /* Make sure the valid position indicator is removed when not dragging */
+        .inventory-item:not(.dragging) {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .inventory-item.valid-position {
+        opacity: 0.7;
+        box-shadow: 0 0 10px #8f8;
+        }
+
+        .inventory-item.dragging {
+        opacity: 0.5;
+        }
+
+        /* For sword items */
+        .item-1x3 {
+        height: 104px !important; /* 3 cells * 36px - 4px for borders */
+        width: 32px !important; /* 1 cell * 36px - 4px for borders */
+        }
+
+        /* Fix for tooltip */
         .tooltip {
         position: absolute;
-        background-color: rgba(0, 0, 0, 0.8);
+        top: -70px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.85);
         color: white;
-        padding: 3px;
-        border-radius: 3px;
-        font-size: 10px;
-        top: -30px;
-        left: 0;
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 12px;
         white-space: nowrap;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        line-height: 1.4;
         }
 
 
@@ -268,7 +296,7 @@
             
             <div class="equipment-slots-right">
                 <div class="slot">Belt</div>
-                <div class="slot">Legs</div>
+                <div class="slot" data-slot-name="Legs"></div>
                 <div class="slot">Boots</div>
                 <div class="slot">Ring</div>
                 <div class="slot">Trinket 1</div>

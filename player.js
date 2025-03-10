@@ -12,10 +12,11 @@ class Player {
       this.armor = this.baseArmor;
       this.chanceToHit = this.baseChanceToHit;
       this.chanceToCrit = this.baseChanceToCrit;
-      // Equipment slots – only mainHand and offHand for now.
+      // Equipment slots – added legs slot
       this.equipment = {
         mainHand: null,
         offHand: null,
+        legs: null
       };
     }
   
@@ -31,6 +32,11 @@ class Player {
       if (this.equipment.offHand) {
         this.attack += Number(this.equipment.offHand.attackPower) || 0;
         this.armor += Number(this.equipment.offHand.armor) || 0;
+      }
+      // Add legs equipment stats
+      if (this.equipment.legs) {
+        this.attack += Number(this.equipment.legs.attackPower) || 0;
+        this.armor += Number(this.equipment.legs.armor) || 0;
       }
       // (Chance to hit and crit could also be modified here if needed.)
     }
@@ -60,4 +66,3 @@ class Player {
   
   export const player = new Player();
   export { updatePlayerStatsUI };
-  
