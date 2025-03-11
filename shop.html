@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop</title>
+  <style>
+    /* Base styling copied/adjusted from your main UI file */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #2c2c2c;
+      color: #e6d3a3;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      width: 200px;
+      background-color: #3a3a3a;
+      padding: 10px;
+      border-right: 2px solid #6b5c2e;
+    }
+    
+    .nav-item {
+      padding: 8px 15px;
+      margin: 5px 0;
+      background-color: #4a4a4a;
+      border: 1px solid #6b5c2e;
+      cursor: pointer;
+      border-radius: 3px;
+      text-align: center;
+      font-weight: bold;
+      color: #e6d3a3;
+      text-decoration: none;
+    }
+    
+    .nav-item:hover {
+      background-color: #5a5a5a;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .shop-container {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+    }
+    
+    .shop-section, .player-section {
+      width: 48%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .portrait {
+      width: 300px;
+      height: 400px;
+      background-color: #4a4a4a;
+      border: 3px solid #6b5c2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .inventory {
+      width: 90%;
+      background-color: #3a3a3a;
+      border: 3px solid #6b5c2e;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    .inventory-title {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #6b5c2e;
+      padding-bottom: 5px;
+      margin-top: 30px;
+    }
+    
+    .inventory-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(12, 36px);
+      grid-template-rows: repeat(5, 36px);
+      gap: 0;
+    }
+    
+    .inventory-slot {
+      width: 36px;
+      height: 36px;
+      background-color: #4a4a4a;
+      border: 1px solid #6b5c2e;
+      box-sizing: border-box;
+    }
+    
+    .inventory-item {
+      background-color: #6b5c2e;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      z-index: 10;
+      border: 2px solid #8a7a3d;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      cursor: grab;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <!-- "Character" now links back to the main screen -->
+    <div class="nav-item"><a href="gladiator-game-ui.html" style="text-decoration: none; color: inherit;">Character</a></div>
+    <div class="nav-item">Shop</div>
+    <div class="nav-item">Arena</div>
+    <div class="nav-item">Dungeon</div>
+    <div class="nav-item">Guild</div>
+    <div class="nav-item">Quests</div>
+    <div class="nav-item">Tavern</div>
+    <div class="nav-item">Auction House</div>
+    <div class="nav-item">Settings</div>
+  </div>
+  
+  <div class="main-content">
+    <div class="shop-container">
+      <!-- Left column: Shop -->
+      <div class="shop-section">
+        <div class="portrait">Shop</div>
+        <div class="inventory">
+          <div class="inventory-title">Shop Inventory</div>
+          <div class="inventory-grid" id="shop-inventory">
+            <!-- Shop items -->
+            <div class="inventory-item" draggable="true" data-item="wooden-sword">Wooden Sword</div>
+            <div class="inventory-item" draggable="true" data-item="rags">Rags</div>
+            <!-- Additional empty slots can be added here if desired -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right column: Player -->
+      <div class="player-section">
+        <div class="portrait">Player</div>
+        <div class="inventory">
+          <div class="inventory-title">Player Inventory</div>
+          <div class="inventory-grid" id="player-inventory">
+            <!-- Player inventory slots will be generated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Dynamically generate 60 empty inventory slots for the player's inventory
+    const playerInventoryGrid = document.getElementById('player-inventory');
+    for (let i = 0; i < 60; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'inventory-slot';
+      slot.dataset.slotIndex = i;
+      playerInventoryGrid.appendChild(slot);
+    }
+    
+    // Add basic drag & drop functionality:
+    // When starting to drag a shop item, set its data.
+    const shopItems = document.querySelectorAll('#shop-inventory .inventory-item');
+    shopItems.forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', item.dataset.item);
+      });
+    });
+    
+    // Allow dropping items into player inventory slots.
+    const playerSlots = document.querySelectorAll('#player-inventory .inventory-slot');
+    playerSlots.forEach(slot => {
+      slot.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      slot.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const itemType = e.dataTransfer.getData('text/plain');
+        // Create a new element for the dropped item.
+        const newItem = document.createElement('div');
+        newItem.className = 'inventory-item';
+        newItem.dataset.item = itemType;
+        newItem.setAttribute('draggable', 'true');
+        newItem.textContent = (itemType === 'wooden-sword') ? 'Wooden Sword' : 'Rags';
+        // Only add the item if the slot is empty.
+        if (!slot.hasChildNodes()) {
+          slot.appendChild(newItem);
+        }
+      });
+    });
+  </script>
+  <!-- Include your existing scripts to handle drag and drop, items, and player logic -->
+  <script src="dragdrop.js"></script>
+  <script src="items.js"></script>
+  <script src="player.js"></script>
+</body>
+</html>
