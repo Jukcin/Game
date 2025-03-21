@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
     defaultMessage.style.display = 'none';
     tutorialMap.classList.add('active');
 
-    // Toggle dropdown visibility
-    dropdownButton.addEventListener('click', function() {
-        // Only show dropdown if dungeon is not active
+    // Toggle dropdown visibility when clicking the button
+    dropdownButton.addEventListener('click', function(event) {
         if (!isDungeonActive) {
             dropdownContent.classList.toggle('show');
+            event.stopPropagation();
         }
     });
 
@@ -69,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Exit the dungeon
             exitDungeon();
+            // Redirect to dungeons.html
+            window.location.href = 'dungeons.html';
         }
     });
 
@@ -76,9 +78,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function startDungeon() {
         isDungeonActive = true;
         
-        // Disable dropdown
+        // Disable dropdown but keep it visible
         dropdownButton.disabled = true;
         dropdownButton.style.opacity = '0.5';
+        dropdownButton.style.cursor = 'default';
         
         // Change button text
         startDungeonButton.textContent = 'Exit Dungeon';
@@ -101,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Enable dropdown
         dropdownButton.disabled = false;
         dropdownButton.style.opacity = '1';
+        dropdownButton.style.cursor = 'pointer';
         
         // Change button text back
         startDungeonButton.textContent = 'Start Dungeon';
@@ -154,6 +158,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentNodeIndex = index;
                     updateNodeVisuals();
                     setupNodeInteractions(); // Update clickable nodes
+                    
+                    // When reaching the exit node (index 3)
+                    if (index === 3) {
+                        setTimeout(() => {
+                            exitDungeon();
+                            // Redirect to dungeons.html when completing the dungeon
+                            window.location.href = 'dungeons.html';
+                        }, 500); // Small delay to show the player they reached the exit
+                    }
                 };
             } else {
                 node.style.cursor = 'default';
@@ -169,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close dropdown when clicking outside
     window.addEventListener('click', function(event) {
-        if (!event.target.matches('.dropdown-button')) {
+        if (!event.target.matches('.dropdown-button') && !isDungeonActive) {
             if (dropdownContent.classList.contains('show')) {
                 dropdownContent.classList.remove('show');
             }
