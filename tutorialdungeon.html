@@ -214,7 +214,24 @@
             cursor: pointer;
             border-color: #8a7a3d;
         }
+        .start-dungeon-button {
+        margin-left: 20px;
+        padding: 10px 15px;
+        background-color: #6b5c2e;
+        border: 2px solid #8a7a3d;
+        color: #e6d3a3;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        }
+        
+        .start-dungeon-button:hover {
+            background-color: #8a7a3d;
+        }
+
+
     </style>
+    <script src="tutorialdungeon.js" defer></script>
 </head>
 <body>
     <div class="sidebar">
@@ -239,6 +256,7 @@
                     <div class="dropdown-item" data-value="outbreak">Outbreak</div>
                 </div>
             </div>
+            <button id="start-dungeon-button" class="start-dungeon-button">Start Dungeon</button>
         </div>
 
         <div class="dungeon-map-container" id="dungeon-map">
