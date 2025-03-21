@@ -6,10 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const defaultMessage = document.getElementById('default-message');
     const tutorialMap = document.getElementById('tutorial-map');
     const startDungeonButton = document.getElementById('start-dungeon-button');
+    const actionTextArea = document.getElementById('action-text-area');
+    const chestNode = document.getElementById('chest-node');
     
     // Track the current node and dungeon state
     let currentNodeIndex = 0;
     let isDungeonActive = false;
+    let chestOpened = false;
     const nodes = document.querySelectorAll('.map-node');
     
     // Navigation to World page
@@ -77,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to start the dungeon
     function startDungeon() {
         isDungeonActive = true;
+        chestOpened = false;
         
         // Disable dropdown but keep it visible
         dropdownButton.disabled = true;
@@ -95,6 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Save the current dungeon state
         localStorage.setItem('activeDungeon', 'tutorial');
+        
+        // Reset chest appearance
+        chestNode.classList.remove('opened');
+        
+        // Update action text
+        updateActionText("Feedback_dungeon_start");
     }
 
     // Function to exit the dungeon
@@ -120,6 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Remove active dungeon from storage
         localStorage.removeItem('activeDungeon');
+        
+        // Update action text
+        updateActionText("Dungeon exited.");
     }
 
     // Update the visuals to show current position
@@ -134,8 +147,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentNodeElement = nodes[currentNodeIndex].querySelector('.node-circle, .node-chest');
             if (currentNodeElement) {
                 currentNodeElement.classList.add('current');
+                
+                // If at chest node, handle chest opening
+                if (currentNodeIndex === 1 && !chestOpened) {
+                    openChest();
+                }
             }
         }
+    }
+    
+    // Function to handle chest opening
+    function openChest() {
+        chestOpened = true;
+        chestNode.classList.add('opened');
+        updateActionText("Feedback_chest_otvoren");
     }
 
     // Reset node visuals to initial state
@@ -159,13 +184,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateNodeVisuals();
                     setupNodeInteractions(); // Update clickable nodes
                     
-                    // When reaching the exit node (index 3)
-                    if (index === 3) {
+                    // Update action text based on node
+                    if (index === 1) { // Chest node
+                        // Text is handled in openChest function
+                    } else if (index === 2) { // Boss node
+                        updateActionText("Feedback_boss_triggeran");
+                    } else if (index === 3) { // Exit node
+                        updateActionText("Feedback_exit");
+                        
+                        // When reaching the exit node (index 3)
                         setTimeout(() => {
                             exitDungeon();
                             // Redirect to dungeons.html when completing the dungeon
                             window.location.href = 'dungeons.html';
-                        }, 500); // Small delay to show the player they reached the exit
+                        }, 2500); // Longer delay to show the completion message
                     }
                 };
             } else {
@@ -174,10 +206,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Function to update action text area
+    function updateActionText(text) {
+        // Add timestamp to message
+        const now = new Date();
+        const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        
+        // Create a new line of text with timestamp
+        const newLine = `[${timestamp}] ${text}`;
+        
+        // Get current content
+        const currentContent = actionTextArea.innerHTML;
+        
+        // Add new text at the top
+        if (currentContent.includes('Actions will be displayed here...')) {
+            actionTextArea.innerHTML = newLine;
+        } else {
+            actionTextArea.innerHTML = newLine + '<br>' + currentContent;
+        }
+    }
 
     // Check if there was an active dungeon when page loaded
     if (localStorage.getItem('activeDungeon') === 'tutorial') {
         startDungeon();
+    } else {
+        // Initial action text
+        actionTextArea.innerHTML = "Actions will be displayed here...";
     }
 
     // Close dropdown when clicking outside

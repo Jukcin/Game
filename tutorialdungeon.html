@@ -169,6 +169,25 @@
             z-index: 1;
         }
         
+        /* Opened chest style */
+        .node-chest.opened {
+            background-color: #6b5c2e; /* Player color for opened chest */
+            border-color: #e6d3a3;
+        }
+        
+        .node-chest.opened:before {
+            background-color: #6b5c2e; /* Player color for opened chest lid */
+            border-color: #e6d3a3;
+            transform: translateX(-50%) rotate(-60deg);
+            transform-origin: bottom left;
+            top: -20px;
+        }
+        
+        .node-chest.current {
+            background-color: #8a7a3d;
+            box-shadow: 0 0 15px #e6d3a3;
+        }
+        
         .path-line {
             position: absolute;
             border-left: 3px dashed #8a7a3d;
@@ -185,7 +204,44 @@
             display: block;
         }
 
+        .bottom-section {
+            display: flex;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+
+        .player-section {
+            display: flex;
+            margin-right: 15px;
+        }
+
+        .player-profile {
+            width: 120px;
+            height: 150px;
+            background-color: #3a3a3a;
+            border: 3px solid #6b5c2e;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a8a8a8;
+        }
+
+        .player-stats {
+            width: 180px;
+            height: 150px;
+            background-color: #3a3a3a;
+            border: 3px solid #6b5c2e;
+            border-radius: 5px;
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
         .action-cards-container {
+            flex: 1;
             height: 150px;
             background-color: #3a3a3a;
             border: 3px solid #6b5c2e;
@@ -214,28 +270,96 @@
             cursor: pointer;
             border-color: #8a7a3d;
         }
+        
+        .action-text-container {
+            width: 250px;
+            height: 150px;
+            background-color: #3a3a3a;
+            border: 3px solid #6b5c2e;
+            border-radius: 5px;
+            margin-left: 15px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        
+        .stat-bar-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+        
+        .stat-bar {
+            height: 20px;
+            background-color: #4a4a4a;
+            border: 2px solid #8a7a3d;
+            border-radius: 3px;
+            position: relative;
+        }
+        
+        .stat-bar-fill {
+            height: 100%;
+            background-color: #8a7a3d;
+            width: 100%; /* Default 100% */
+            border-radius: 1px;
+        }
+        
+        .health-bar-fill {
+            background-color: #a83232; /* Red for health */
+        }
+        
+        .stamina-bar-fill {
+            background-color: #3c8a32; /* Green for stamina */
+        }
+        
+        .stat-value {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #e6d3a3;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+        }
+        
+        .action-text-area {
+            flex: 1;
+            background-color: #4a4a4a;
+            border: 2px solid #8a7a3d;
+            border-radius: 3px;
+            padding: 5px;
+            overflow-y: auto;
+            color: #e6d3a3;
+        }
+
         .start-dungeon-button {
-        margin-left: 20px;
-        padding: 10px 15px;
-        background-color: #6b5c2e;
-        border: 2px solid #8a7a3d;
-        color: #e6d3a3;
-        font-weight: bold;
-        border-radius: 5px;
-        cursor: pointer;
+            margin-left: 20px;
+            padding: 10px 15px;
+            background-color: #6b5c2e;
+            border: 2px solid #8a7a3d;
+            color: #e6d3a3;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
         }
         
         .start-dungeon-button:hover {
             background-color: #8a7a3d;
         }
-
-
     </style>
     <script src="tutorialdungeon.js" defer></script>
+    <script src="mapControls.js" defer></script>
 </head>
 <body>
     <div class="sidebar">
-        <div class="nav-item" id="nav-world">World</div>
+        <div class="nav-item" id="nav-world">Character</div>
         <div class="nav-item">Shop</div>
         <div class="nav-item">Arena</div>
         <div class="nav-item" id="nav-dungeon">Dungeon</div>
@@ -274,7 +398,7 @@
                 
                 <!-- Chest Node -->
                 <div class="map-node" style="bottom: 200px; left: 50%; transform: translateX(-50%);">
-                    <div class="node-chest">Chest</div>
+                    <div class="node-chest" id="chest-node">Chest</div>
                 </div>
                 
                 <!-- Path from Chest to Boss -->
@@ -295,12 +419,52 @@
             </div>
         </div>
 
-        <div class="action-cards-container">
-            <div class="action-card">Action 1</div>
-            <div class="action-card">Action 2</div>
-            <div class="action-card">Action 3</div>
-            <div class="action-card">Action 4</div>
-            <div class="action-card">Action 5</div>
+        <div class="bottom-section">
+            <!-- Player section with profile and stats side by side -->
+            <div class="player-section">
+                <!-- Player profile section -->
+                <div class="player-profile">
+                    Player Profile
+                </div>
+                
+                <!-- Player stats (health and stamina) -->
+                <div class="player-stats">
+                    <!-- Health bar -->
+                    <div class="stat-bar-container">
+                        <div class="stat-label">Health</div>
+                        <div class="stat-bar">
+                            <div class="stat-bar-fill health-bar-fill" id="health-bar-fill"></div>
+                            <div class="stat-value" id="health-value">100/100</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stamina bar -->
+                    <div class="stat-bar-container">
+                        <div class="stat-label">Stamina</div>
+                        <div class="stat-bar">
+                            <div class="stat-bar-fill stamina-bar-fill" id="stamina-bar-fill"></div>
+                            <div class="stat-value" id="stamina-value">100/100</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action cards container -->
+            <div class="action-cards-container">
+                <div class="action-card">Action 1</div>
+                <div class="action-card">Action 2</div>
+                <div class="action-card">Action 3</div>
+                <div class="action-card">Action 4</div>
+                <div class="action-card">Action 5</div>
+            </div>
+            
+            <!-- Action text container -->
+            <div class="action-text-container">
+                <!-- Action text area -->
+                <div class="action-text-area" id="action-text-area">
+                    Actions will be displayed here...
+                </div>
+            </div>
         </div>
     </div>
 
@@ -312,6 +476,7 @@
             const dungeonMap = document.getElementById('dungeon-map');
             const defaultMessage = document.getElementById('default-message');
             const tutorialMap = document.getElementById('tutorial-map');
+            const actionTextArea = document.getElementById('action-text-area');
             
             // Add navigation functionality
             document.getElementById('nav-world').addEventListener('click', function() {
