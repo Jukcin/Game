@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gladiator Game UI</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #2c2c2c;
+            color: #e6d3a3;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #3a3a3a;
+            padding: 10px;
+            border-right: 2px solid #6b5c2e;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-item {
+            padding: 8px 15px;
+            margin: 5px 0;
+            background-color: #4a4a4a;
+            border: 1px solid #6b5c2e;
+            cursor: pointer;
+            border-radius: 3px;
+            text-align: center;
+            font-weight: bold;
+            color: #e6d3a3;
+        }
+
+        .nav-item:hover {
+            background-color: #5a5a5a;
+        }
+
+        .stats-panel {
+            width: 80%;
+            background-color: #3a3a3a;
+            border: 2px solid #6b5c2e;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .stats-title {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #6b5c2e;
+            padding-bottom: 5px;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .character-panel {
+            display: flex;
+            justify-content: center;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+
+        .equipment-slots-left, .equipment-slots-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .weapon-slots-container {
+            display: flex;
+            justify-content: center;
+            margin-top: -105px;
+            width: 100%;
+        }
+
+        .weapon-slot {
+            width: 80px;
+            height: 80px;
+            background-color: #4a4a4a;
+            border: 2px solid #6b5c2e;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #a8a8a8;
+            position: relative;
+        }
+
+        .weapon-slot::after {
+            content: attr(data-slot-name);
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #e6d3a3;
+        }
+
+        .slot {
+            width: 80px;
+            height: 80px;
+            background-color: #4a4a4a;
+            border: 2px solid #6b5c2e;
+            margin: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #a8a8a8;
+        }
+
+        .portrait {
+            width: 300px;
+            height: 400px;
+            background-color: #4a4a4a;
+            border: 3px solid #6b5c2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 20px;
+        }
+
+        .inventory {
+            width: 90%;
+            background-color: #3a3a3a;
+            border: 3px solid #6b5c2e;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .inventory-title {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #6b5c2e;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        .inventory-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(12, 36px) !important; /* Smaller grid */
+        grid-template-rows: repeat(5, 36px) !important; /* Smaller grid */
+        gap: 0;
+        }
+
+        .inventory-slot {
+        width: 36px !important;
+        height: 36px !important;
+        background-color: #4a4a4a;
+        border: 1px solid #6b5c2e;
+        box-sizing: border-box;
+        }
+
+        .inventory-item {
+        background-color: #6b5c2e;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px; /* Slightly smaller for better fit */
+        z-index: 10;
+        border: 2px solid #8a7a3d;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        box-sizing: border-box; /* Include borders in size calculations */
+        }
+
+        /* Make sure the valid position indicator is removed when not dragging */
+        .inventory-item:not(.dragging) {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .inventory-item.valid-position {
+        opacity: 0.7;
+        box-shadow: 0 0 10px #8f8;
+        }
+
+        .inventory-item.dragging {
+        opacity: 0.5;
+        }
+
+        /* For sword items */
+        .item-1x3 {
+        height: 104px !important; /* 3 cells * 36px - 4px for borders */
+        width: 32px !important; /* 1 cell * 36px - 4px for borders */
+        }
+
+        /* Fix for tooltip */
+        .tooltip {
+        position: absolute;
+        top: -70px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        line-height: 1.4;
+        }
+
+
+
+
+        /* Items of different sizes */
+        .item-1x3 {
+        height: 120px;
+        grid-row: span 3;
+        }
+
+        /* Optional styling for occupied slots */
+        .inventory-slot.occupied {
+        background-color: transparent;
+        border: none;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="nav-item">World</div>
+        <div class="nav-item">Shop</div>
+        <div class="nav-item">Arena</div>
+        <div class="nav-item">Dungeon</div>
+        <div class="nav-item">Guild</div>
+        <div class="nav-item">Quests</div>
+        <div class="nav-item">Tavern</div>
+        <div class="nav-item">Auction House</div>
+        <div class="nav-item">Settings</div>
+    </div>
+
+    <div class="main-content">
+        <div class="stats-panel">
+            <div class="stats-title">Character Stats</div>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div>Attack Power</div>
+                    <div id="stat-attack-power">1</div>
+                </div>
+                <div class="stat-item">
+                    <div>Armor</div>
+                    <div id="stat-armor">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>Chance to Hit</div>
+                    <div id="stat-chance-to-hit">70%</div>
+                </div>
+                <div class="stat-item">
+                    <div>Chance to Critical Hit</div>
+                    <div id="stat-chance-to-crit">1%</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="equipment" class="character-panel">
+            <div class="equipment-slots-left">
+                <div class="slot">Head</div>
+                <div class="slot">Neck</div>
+                <div class="slot">Shoulder</div>
+                <div class="slot">Back</div>
+                <div class="slot">Chest</div>
+            </div>
+            
+            <div class="portrait">Portrait<br>(Add Image Later)</div>
+            
+            <div class="equipment-slots-right">
+                <div class="slot">Belt</div>
+                <div class="slot" data-slot-name="Legs"></div>
+                <div class="slot">Boots</div>
+                <div class="slot">Ring</div>
+                <div class="slot">Trinket 1</div>
+                <div class="slot">Trinket 2</div>
+            </div>
+        </div>
+        <div id="equipment" class="character-panel">
+            <div class="weapon-slot" data-slot-name="Main Hand"></div>
+            <div class="weapon-slot" data-slot-name="Off Hand"></div>
+        </div>
+        <div class="inventory-title">Inventory</div>
+        <div id="inventory" class="inventory-grid">
+            <!-- 5 rows of 12 slots = 60 slots total -->
+            <!-- Row 1 -->
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            
+            <!-- Row 2 -->
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            
+            <!-- Row 3 -->
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            
+            <!-- Row 4 -->
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            
+            <!-- Row 5 -->
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+        </div>
+    </div>
+    <script type="module" src="Draganddropitems.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add navigation to Dungeon page
+            document.querySelector('.nav-item:nth-child(4)').addEventListener('click', function() {
+                window.location.href = 'dungeons.html';
+            });
+        });
+    </script>
+</body>
+</html>

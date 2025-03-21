@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gladiator Game - Dungeon</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #2c2c2c;
+            color: #e6d3a3;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #3a3a3a;
+            padding: 10px;
+            border-right: 2px solid #6b5c2e;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-item {
+            padding: 8px 15px;
+            margin: 5px 0;
+            background-color: #4a4a4a;
+            border: 1px solid #6b5c2e;
+            cursor: pointer;
+            border-radius: 3px;
+            text-align: center;
+            font-weight: bold;
+            color: #e6d3a3;
+        }
+
+        .nav-item:hover {
+            background-color: #5a5a5a;
+        }
+
+        .dungeon-header {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .dungeon-selector {
+            position: relative;
+            width: 250px;
+        }
+
+        .dropdown-button {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: #4a4a4a;
+            border: 2px solid #6b5c2e;
+            color: #e6d3a3;
+            text-align: left;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-button:after {
+            content: '▼';
+            font-size: 12px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            width: 100%;
+            background-color: #3a3a3a;
+            border: 2px solid #6b5c2e;
+            border-top: none;
+            z-index: 10;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #6b5c2e;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #4a4a4a;
+        }
+
+        .dungeon-map-container {
+            flex: 1;
+            background-color: #3a3a3a;
+            border: 3px solid #6b5c2e;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a8a8a8;
+            position: relative;
+        }
+        
+        /* Dungeon Map Styles */
+        .map-node {
+            position: absolute;
+            cursor: pointer;
+        }
+        
+        .node-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #8a7a3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4a4a4a;
+            z-index: 2;
+        }
+        
+        .node-circle.current {
+            background-color: #6b5c2e;
+            box-shadow: 0 0 15px #e6d3a3;
+        }
+        
+        .node-chest {
+            width: 60px;
+            height: 40px;
+            border: 3px solid #8a7a3d;
+            border-radius: 5px;
+            background-color: #4a4a4a;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .node-chest:before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 10px;
+            background-color: #4a4a4a;
+            border: 3px solid #8a7a3d;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            z-index: 1;
+        }
+        
+        .path-line {
+            position: absolute;
+            border-left: 3px dashed #8a7a3d;
+            z-index: 1;
+        }
+        
+        .tutorial-map {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .tutorial-map.active {
+            display: block;
+        }
+
+        .action-cards-container {
+            height: 150px;
+            background-color: #3a3a3a;
+            border: 3px solid #6b5c2e;
+            border-radius: 5px;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .action-card {
+            width: 100px;
+            height: 120px;
+            background-color: #4a4a4a;
+            border: 2px solid #6b5c2e;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a8a8a8;
+        }
+
+        .action-card:hover {
+            background-color: #5a5a5a;
+            cursor: pointer;
+            border-color: #8a7a3d;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="nav-item" id="nav-world">World</div>
+        <div class="nav-item">Shop</div>
+        <div class="nav-item">Arena</div>
+        <div class="nav-item" id="nav-dungeon">Dungeon</div>
+        <div class="nav-item">Guild</div>
+        <div class="nav-item">Quests</div>
+        <div class="nav-item">Tavern</div>
+        <div class="nav-item">Auction House</div>
+        <div class="nav-item">Settings</div>
+    </div>
+
+    <div class="main-content">
+        <div class="dungeon-header">
+            <div class="dungeon-selector">
+                <button class="dropdown-button" id="dropdown-button">Select Dungeon</button>
+                <div class="dropdown-content" id="dropdown-content">
+                    <div class="dropdown-item" data-value="tutorial">Tutorial</div>
+                    <div class="dropdown-item" data-value="trials">Trials of the Gladiator</div>
+                    <div class="dropdown-item" data-value="outbreak">Outbreak</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dungeon-map-container" id="dungeon-map">
+            <div id="default-message">Select a dungeon to view the map</div>
+            
+            <!-- Tutorial Map -->
+            <div class="tutorial-map" id="tutorial-map">
+                <!-- Starting Node (Current position) -->
+                <div class="map-node" style="bottom: 50px; left: 50%; transform: translateX(-50%);">
+                    <div class="node-circle current">Start</div>
+                </div>
+                
+                <!-- Path from Start to Chest -->
+                <div class="path-line" style="height: 100px; bottom: 100px; left: 50%; transform: translateX(-50%);"></div>
+                
+                <!-- Chest Node -->
+                <div class="map-node" style="bottom: 200px; left: 50%; transform: translateX(-50%);">
+                    <div class="node-chest">Chest</div>
+                </div>
+                
+                <!-- Path from Chest to Boss -->
+                <div class="path-line" style="height: 100px; bottom: 250px; left: 50%; transform: translateX(-50%);"></div>
+                
+                <!-- Boss Node -->
+                <div class="map-node" style="bottom: 350px; left: 50%; transform: translateX(-50%);">
+                    <div class="node-circle">Boss</div>
+                </div>
+                
+                <!-- Path from Boss to Exit -->
+                <div class="path-line" style="height: 100px; bottom: 400px; left: 50%; transform: translateX(-50%);"></div>
+                
+                <!-- Exit Node -->
+                <div class="map-node" style="bottom: 500px; left: 50%; transform: translateX(-50%);">
+                    <div class="node-circle">Exit</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-cards-container">
+            <div class="action-card">Action 1</div>
+            <div class="action-card">Action 2</div>
+            <div class="action-card">Action 3</div>
+            <div class="action-card">Action 4</div>
+            <div class="action-card">Action 5</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownButton = document.getElementById('dropdown-button');
+            const dropdownContent = document.getElementById('dropdown-content');
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            const dungeonMap = document.getElementById('dungeon-map');
+            const defaultMessage = document.getElementById('default-message');
+            const tutorialMap = document.getElementById('tutorial-map');
+            
+            // Add navigation functionality
+            document.getElementById('nav-world').addEventListener('click', function() {
+                window.location.href = 'gladiator-game-ui.html';
+            });
+            
+            document.getElementById('nav-dungeon').addEventListener('click', function() {
+                window.location.href = 'dungeons.html';
+            });
+    
+            // Automatically display the tutorial map when page loads
+            dropdownButton.textContent = 'Tutorial';
+            defaultMessage.style.display = 'none';
+            tutorialMap.classList.add('active');
+    
+            // Toggle dropdown visibility
+            dropdownButton.addEventListener('click', function() {
+                dropdownContent.classList.toggle('show');
+            });
+    
+            // Handle dropdown item selection
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const dungeonName = this.textContent;
+                    const dungeonValue = this.getAttribute('data-value');
+                    
+                    // Update dropdown button text
+                    dropdownButton.textContent = dungeonName;
+                    
+                    // Hide dropdown
+                    dropdownContent.classList.remove('show');
+                    
+                    // If another dungeon is selected from tutorial page, go back to main page
+                    if (dungeonValue !== 'tutorial') {
+                        window.location.href = 'dungeons.html';
+                        return;
+                    }
+                    
+                    // Show tutorial map
+                    defaultMessage.style.display = 'none';
+                    tutorialMap.classList.add('active');
+                    
+                    console.log(`Selected dungeon: ${dungeonValue}`);
+                });
+            });
+    
+            // Close dropdown when clicking outside
+            window.addEventListener('click', function(event) {
+                if (!event.target.matches('.dropdown-button')) {
+                    if (dropdownContent.classList.contains('show')) {
+                        dropdownContent.classList.remove('show');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
